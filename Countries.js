@@ -1,49 +1,18 @@
 'use strict';
 
-const wdk = require('wikidata-sdk');
-const request = require('request');
-
+const WikiData = require('./WikiData');
 const queries = require('./queries.js');
 
-const WikidataHelper = require('./WikidataHelper');
 
 
-class Countries {
-    constructor(db) {
-        this.wdk = wdk;
+class Countries extends WikiData {
+    constructor(db, collection) {
+
+        super(db, collection);
+
+
+        this.collection = this.db.collection(collection);
         this.url = this.wdk.sparqlQuery(queries.countries);
-        this.helper = new WikidataHelper();
-        this.countries = [];
-        this.db = db;
-        this.collection = this.db.collection('countries');
-    }
-
-
-    __getSparql(url) {
-
-        let promise = new Promise((resolve, reject) => {
-            request(url, (err, res, body) => {
-
-                if (err) {
-                    return reject(err);
-                }
-
-                let data;
-
-                try {
-                    data = this.wdk.simplifySparqlResults(JSON.parse(body));
-                } catch (err) {
-                    console.error(err);
-                    return reject(err);
-                }
-
-                return resolve(data);
-            });
-        });
-
-        return promise;
-
-
     }
 
 
@@ -77,102 +46,6 @@ class Countries {
         });
     }
 
-
-
-    __saveToDb(data) {
-        return new Promise((resolve, reject) => {
-
-            this.collection.insertMany(data, function(err, result) {
-                if (err) {
-                    console.log(err);
-                    return reject(err);
-                }
-
-                return resolve(data);
-            });
-        });
-
-    }
-
-    __dropCollection(countries) {
-        return new Promise((resolve, reject) => {
-
-            this.collection.remove({}, (err) => {
-                if (err) {
-                    return reject(err);
-                }
-
-                return resolve(countries);
-            });
-        });
-    }
-
-
-    __isCollectionEmpty() {
-
-        return new Promise((resolve, reject) => {
-                this.collection.count(function (err, count) {
-                if (err) {
-                    return reject(err);
-                }
-
-                return resolve(count > 0);
-            });
-        });
-    }
-
-    populateDb() {
-        console.log('start to populate db!');
-        return this.__getSparql(this.url)
-            .then(data => {
-                let parsed = this.__parseData(data);
-                return parsed;
-            })
-            .then(countries => {
-                countries = this.helper.removeDups(countries);
-                return this.__dropCollection(countries);
-            })
-            .then(countries => {
-                return this.__saveToDb(countries);
-            })
-            .catch(console.error);
-    }
-
-
-    __getData(ids) {
-
-        let query = {};
-
-        if (Array.isArray(ids) && ids.length > 0) {
-            query = {_id: {$in: ids}};
-        }
-
-        return new Promise((resolve, reject) => {
-
-            this.collection.find(query).toArray((err, countries) => {
-                if (err) {
-                    return reject(err);
-                }
-
-                return resolve(countries);
-            });
-        });
-    }
-
-    get() {
-        return this.__isCollectionEmpty()
-            .then((notEmpty) => {
-                if (notEmpty) {
-                    return this.__getData();
-                }
-
-                return this.populateDb();
-            });
-    }
-
-    getOne(id) {
-        return this.__getData([id]);
-    }
 }
 
 

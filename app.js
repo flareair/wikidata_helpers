@@ -10,7 +10,7 @@ dbClient.connect('mongodb://localhost:27017/test', function(err, db) {
         return console.log(err);
     }
 
-    let countries = new Countries(db);
+    let countries = new Countries(db, 'countries');
     countries.get()
         .then((countries) => {
             console.log(`${countries.length} countries`);
