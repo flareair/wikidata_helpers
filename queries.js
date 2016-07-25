@@ -26,27 +26,29 @@ ORDER BY ?_idLabel
 
     `,
     regions: `
-SELECT DISTINCT ?region ?regionLabel ?capital ?capitalLabel ?flag ?coordinates WHERE {
-  ?region (wdt:P31/wdt:P279*) wd:Q10864048.
-  ?region wdt:P36 ?capital.
-  ?region wdt:P41 ?flag.
-  ?region wdt:P625 ?coordinates
+SELECT DISTINCT ?_id ?_idLabel ?capital ?capitalLabel ?flag ?coordinates WHERE {
+  ?_id (wdt:P31/wdt:P279*) wd:Q10864048.
+  ?_id wdt:P36 ?capital.
+  ?_id wdt:P41 ?flag.
+  ?_id wdt:P625 ?coordinates
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en" .}
 }
+ORDER BY ?_id
 `,
     cities: `
-SELECT DISTINCT ?city ?cityLabel ?countryLabel ?population
+SELECT DISTINCT ?_id ?_idLabel ?countryLabel ?population
 (GROUP_CONCAT(distinct ?region; separator = ",") as ?regions)
 WHERE {
-    ?city wdt:P31/wdt:P279* wd:Q515 .
-    ?city wdt:P1082 ?population .
-    ?city wdt:P17 ?country .
-    ?city wdt:P131 ?region .
+    ?_id wdt:P31/wdt:P279* wd:Q515 .
+    ?_id wdt:P1082 ?population .
+    ?_id wdt:P17 ?country .
+    ?_id wdt:P131 ?region .
     FILTER(?population > 40000).
     SERVICE wikibase:label {
         bd:serviceParam wikibase:language "en" .
     }
 }
-GROUP BY ?city ?cityLabel ?countryLabel ?population
-    `
+GROUP BY ?_id ?_idLabel ?countryLabel ?population
+ORDER BY ?_id
+`
 };

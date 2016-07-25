@@ -3,7 +3,7 @@
 const wdk = require('wikidata-sdk');
 const request = require('request');
 
-const queries = require('./queries.js');
+const queries = require('../queries.js');
 
 const WikidataHelper = require('./WikidataHelper');
 

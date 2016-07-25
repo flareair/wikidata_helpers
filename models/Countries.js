@@ -1,7 +1,7 @@
 'use strict';
 
 const WikiData = require('./WikiData');
-const queries = require('./queries.js');
+const queries = require('../queries.js');
 
 
 
@@ -21,7 +21,7 @@ class Countries extends WikiData {
             country.name = country._id.label;
             country._id = country._id.value;
 
-            let regions = country.regions.split(', ');
+            let regions = country.regions.split(', ').filter(Boolean);
 
             let siblingsIds = this.helper.parseIds(country.siblings.split(', '));
             let siblingsNames = country.siblingLabels.split(', ');
