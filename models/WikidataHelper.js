@@ -24,6 +24,10 @@ class WikidataHelper {
         });
     }
 
+    parseId(url) {
+        return url.slice(url.indexOf('Q'));
+    }
+
     removeDups(data) {
         let prev = data[0];
         return data.filter((current, index) => {

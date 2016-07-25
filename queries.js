@@ -26,13 +26,17 @@ ORDER BY ?_idLabel
 
     `,
     regions: `
-SELECT DISTINCT ?_id ?_idLabel ?capital ?capitalLabel ?flag ?coordinates WHERE {
+SELECT DISTINCT ?_id ?_idLabel ?capital ?capitalLabel ?flag ?coordinates
+(GROUP_CONCAT(DISTINCT(?secondsub); separator = ", ") as ?secondsubs)
+WHERE {
   ?_id (wdt:P31/wdt:P279*) wd:Q10864048.
-  ?_id wdt:P36 ?capital.
-  ?_id wdt:P41 ?flag.
-  ?_id wdt:P625 ?coordinates
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en" .}
+  OPTIONAL{?_id wdt:P150 ?secondsub.}
+  OPTIONAL{?_id wdt:P36 ?capital.}
+  OPTIONAL{?_id wdt:P625 ?coordinates}
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en" .
+                         }
 }
+GROUP BY ?_id ?_idLabel ?capital ?capitalLabel ?flag ?coordinates
 ORDER BY ?_id
 `,
     cities: `
