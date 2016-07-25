@@ -171,6 +171,10 @@ class WikiData {
             });
     }
 
+    getByIds(ids) {
+        return this.__getData(ids);
+    }
+
     getOne(id) {
         return this.__getData([id]);
     }
